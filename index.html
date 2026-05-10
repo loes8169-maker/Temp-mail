@@ -3,56 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TempMailX - Pro Look</title>
+    <title>X-Mail | Unique Disposable Inbox</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <div class="logo">TempMailX<span>.xnx</span></div>
-        <nav>
-            <a href="#">Blog</a>
-            <a href="#">Help</a>
-            <a href="#">FAQ</a>
-            <a href="#">Privacy</a>
-            <a href="#">Contact</a>
-        </nav>
-        <div class="header-right">
-            <i class="fas fa-moon"></i>
-            <select><option>EN</option></select>
-        </div>
-    </header>
+    <div class="app-container">
+        <header>
+            <div class="logo"><i class="fas fa-bolt"></i> X-MAIL</div>
+            <p>Fast, Secure, and Anonymous</p>
+        </header>
 
-    <main>
-        <section class="hero">
-            <h1>Your temporary email address is ready</h1>
-            <div class="mail-container">
-                <input type="text" id="mail-address" value="bale546@dl.linkpc.net" readonly>
-                <div class="action-sidebar">
-                    <button class="action-btn"><i class="fas fa-copy"></i> Copy</button>
-                    <button class="action-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
-                    <button class="action-btn"><i class="fas fa-plus"></i> New</button>
-                    <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
-                </div>
+        <section class="main-card">
+            <div class="input-group">
+                <input type="text" id="mail-address" readonly placeholder="Generating email...">
+                <button onclick="copyEmail()" class="copy-btn">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+            </div>
+
+            <div class="action-grid">
+                <button onclick="generateNewEmail()" class="grid-btn">
+                    <i class="fas fa-plus"></i> New Mail
+                </button>
+                <button onclick="checkInbox()" class="grid-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button onclick="deleteMail()" class="grid-btn delete">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
             </div>
         </section>
 
-        <section class="inbox-section">
-            <table class="inbox-table">
-                <thead>
-                    <tr>
-                        <th>Sender</th>
-                        <th>Subject</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                    </tr>
-                    </tbody>
-            </table>
+        <section class="inbox-container">
+            <h3><i class="fas fa-inbox"></i> Inbox</h3>
+            <div id="inbox-list">
+                <div class="empty-state">Waiting for incoming messages...</div>
+            </div>
         </section>
-    </main>
-<script src="script.js"></script></body>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>

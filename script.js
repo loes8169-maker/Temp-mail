@@ -1,64 +1,45 @@
 const apiURL = "https://www.1secmail.com/api/v1/";
-let currentEmail = "";
+let userEmail = "";
 
-// ১. পেজ লোড হলেই নতুন মেইল তৈরি হবে
-window.onload = () => {
-    generateNewEmail();
-};
+// পেজ লোড হলে অটো মেইল তৈরি হবে
+window.onload = generateNewEmail;
 
-// ২. নতুন ইমেইল জেনারেট করার ফাংশন
 async function generateNewEmail() {
-    const response = await fetch(`${apiURL}?action=genEmail&count=1`);
-    const data = await response.json();
-    currentEmail = data[0];
-    document.getElementById("mail-address").value = currentEmail;
-    
-    // ইনবক্স পরিষ্কার করা এবং নতুন মেইল চেক করা
-    document.querySelector(".inbox-table tbody").innerHTML = '<tr><td colspan="3" style="text-align:center;">Checking for new messages...</td></tr>';
-    startCheckingInbox();
+    const res = await fetch(`${apiURL}?action=genEmail&count=1`);
+    const data = await res.json();
+    userEmail = data[0];
+    document.getElementById("mail-address").value = userEmail;
+    checkInbox(); // ইনবক্স রিফ্রেশ
 }
 
-// ৩. কপি ফাংশন
 function copyEmail() {
-    const emailField = document.getElementById("mail-address");
-    emailField.select();
+    const copyText = document.getElementById("mail-address");
+    copyText.select();
     document.execCommand("copy");
-    alert("Email copied: " + currentEmail);
+    alert("Email Copied!");
 }
 
-// ৪. ইনবক্স চেক করার ফাংশন
-async function startCheckingInbox() {
-    const [user, domain] = currentEmail.split('@');
-    const response = await fetch(`${apiURL}?action=getMessages&login=${user}&domain=${domain}`);
-    const emails = await response.json();
+async function checkInbox() {
+    if(!userEmail) return;
+    const [user, domain] = userEmail.split("@");
+    const res = await fetch(`${apiURL}?action=getMessages&login=${user}&domain=${domain}`);
+    const emails = await res.json();
     
-    const tbody = document.querySelector(".inbox-table tbody");
-    tbody.innerHTML = ""; // আগের মেইলগুলো মুছে ফেলা
-
-    if (emails.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Waiting for emails...</td></tr>';
+    const inboxList = document.getElementById("inbox-list");
+    if(emails.length === 0) {
+        inboxList.innerHTML = '<div class="empty-state">No messages yet...</div>';
     } else {
-        emails.forEach(email => {
-            const row = `<tr>
-                <td>${email.from}</td>
-                <td>${email.subject}</td>
-                <td>Just now</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
+        inboxList.innerHTML = emails.map(msg => `
+            <div style="background:#0f172a; padding:10px; border-radius:10px; margin-bottom:10px; border-left:4px solid #6366f1">
+                <strong>From:</strong> ${msg.from}<br>
+                <strong>Subject:</strong> ${msg.subject}
+            </div>
+        `).join("");
     }
 }
 
-// ৫. বাটনগুলোর সাথে ফাংশন কানেক্ট করা
-document.querySelectorAll('.action-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const text = this.innerText.trim();
-        if (text === "Copy") copyEmail();
-        if (text === "Refresh") startCheckingInbox();
-        if (text === "New") generateNewEmail();
-        if (text === "Delete") {
-            document.getElementById("mail-address").value = "Deleted...";
-            setTimeout(generateNewEmail, 1000);
-        }
-    });
-});
+function deleteMail() {
+    userEmail = "";
+    document.getElementById("mail-address").value = "Deleting...";
+    setTimeout(generateNewEmail, 500);
+}
