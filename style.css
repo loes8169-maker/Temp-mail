@@ -1,5 +1,8 @@
-button:hover {
-  transform: translateY(-3px); /* সামান্য উপরে উঠবে */
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* হালকা গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
 }
