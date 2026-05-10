@@ -1,110 +1,64 @@
-let currentSid = "";   // সেশন টোকেন স্টোর করবে
-let currentEmail = ""; // ইমেল অ্যাড্রেস স্টোর করবে
+const apiURL = "https://www.1secmail.com/api/v1/";
+let currentEmail = "";
 
-// 🔹 নতুন ইমেল জেনারেট করা (Guerrilla Mail API)
+// ১. পেজ লোড হলেই নতুন মেইল তৈরি হবে
+window.onload = () => {
+    generateNewEmail();
+};
+
+// ২. নতুন ইমেইল জেনারেট করার ফাংশন
 async function generateNewEmail() {
-    try {
-        const response = await fetch('https://api.guerrillamail.com/ajax.php?f=get_email_address&lang=en');
-        const data = await response.json();
-        
-        currentSid = data.sid_token;
-        currentEmail = data.email_addr;
-        
-        document.getElementById('email').value = currentEmail;
-        
-        // লোকাল স্টোরেজে সেভ করে রাখো
-        localStorage.setItem('gm_sid', currentSid);
-        localStorage.setItem('gm_email', currentEmail);
-        
-        // ইনবক্স চেক করা
-        await checkInbox();
-    } catch (error) {
-        console.error("API error:", error);
-        document.getElementById('email').value = "API error! Refresh page.";
-    }
+    const response = await fetch(`${apiURL}?action=genEmail&count=1`);
+    const data = await response.json();
+    currentEmail = data[0];
+    document.getElementById("mail-address").value = currentEmail;
+    
+    // ইনবক্স পরিষ্কার করা এবং নতুন মেইল চেক করা
+    document.querySelector(".inbox-table tbody").innerHTML = '<tr><td colspan="3" style="text-align:center;">Checking for new messages...</td></tr>';
+    startCheckingInbox();
 }
 
-// 🔹 ইনবক্স থেকে মেসেজ আনা
-async function checkInbox() {
-    if (!currentSid) {
-        // আগের সেশন থাকলে লোড করো
-        currentSid = localStorage.getItem('gm_sid');
-        currentEmail = localStorage.getItem('gm_email');
-        if (!currentSid) {
-            await generateNewEmail();
-            return;
-        }
-        document.getElementById('email').value = currentEmail;
-    }
-
-    try {
-        const response = await fetch(`https://api.guerrillamail.com/ajax.php?f=get_email_list&offset=0&sid_token=${currentSid}`);
-        const data = await response.json();
-        
-        const messageList = document.getElementById('messageList');
-        messageList.innerHTML = "";
-        
-        if (data.list && data.list.length > 0) {
-            data.list.forEach(msg => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>📨 From:</strong> ${msg.mail_from} <br>
-                                <strong>📝 Subject:</strong> ${msg.mail_subject} <br>
-                                <strong>🕒 Time:</strong> ${new Date(msg.mail_timestamp * 1000).toLocaleString()}<br>
-                                <button class="viewBtn" data-id="${msg.mail_id}">দেখুন</button>`;
-                messageList.appendChild(li);
-            });
-            
-            // প্রতিটি "দেখুন" বাটনে ক্লিক ইভেন্ট লাগানো
-            document.querySelectorAll('.viewBtn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const emailId = e.target.getAttribute('data-id');
-                    await viewEmail(emailId);
-                });
-            });
-        } else {
-            messageList.innerHTML = "<li>📭 কোনো মেইল নেই।</li>";
-        }
-    } catch (error) {
-        console.error("Inbox error:", error);
-    }
-}
-
-// 🔹 নির্দিষ্ট ইমেল দেখা
-async function viewEmail(emailId) {
-    try {
-        const response = await fetch(`https://api.guerrillamail.com/ajax.php?f=fetch_email&email_id=${emailId}&sid_token=${currentSid}`);
-        const data = await response.json();
-        
-        alert(`📧 সাবজেক্ট: ${data.mail_subject}\n\n📄 মেইল বডি:\n${data.mail_body.substring(0, 500)}`);
-    } catch (error) {
-        console.error("Fetch email error:", error);
-        alert("মেইল দেখানো যাচ্ছে না");
-    }
-}
-
-// 🔹 ইমেইল কপি করা
+// ৩. কপি ফাংশন
 function copyEmail() {
-    const emailField = document.getElementById('email');
+    const emailField = document.getElementById("mail-address");
     emailField.select();
     document.execCommand("copy");
-    alert("✅ ইমেইল কপি হয়েছে!");
+    alert("Email copied: " + currentEmail);
 }
 
-// 🔹 পেজ লোড হওয়ার সময় রান হবে
-window.onload = () => {
-    // এগিয়ে থাকা সেশন চেক করো
-    const oldSid = localStorage.getItem('gm_sid');
-    if (oldSid) {
-        currentSid = oldSid;
-        currentEmail = localStorage.getItem('gm_email');
-        document.getElementById('email').value = currentEmail;
-        checkInbox();
-    } else {
-        generateNewEmail();
-    }
+// ৪. ইনবক্স চেক করার ফাংশন
+async function startCheckingInbox() {
+    const [user, domain] = currentEmail.split('@');
+    const response = await fetch(`${apiURL}?action=getMessages&login=${user}&domain=${domain}`);
+    const emails = await response.json();
     
-    // বাটনগুলোর কাজ বসানো
-    document.getElementById('copyBtn').onclick = copyEmail;
-    document.getElementById('refreshBtn').onclick = () => checkInbox();
-    document.getElementById('newBtn').onclick = () => generateNewEmail();
-};
+    const tbody = document.querySelector(".inbox-table tbody");
+    tbody.innerHTML = ""; // আগের মেইলগুলো মুছে ফেলা
+
+    if (emails.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Waiting for emails...</td></tr>';
+    } else {
+        emails.forEach(email => {
+            const row = `<tr>
+                <td>${email.from}</td>
+                <td>${email.subject}</td>
+                <td>Just now</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+}
+
+// ৫. বাটনগুলোর সাথে ফাংশন কানেক্ট করা
+document.querySelectorAll('.action-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const text = this.innerText.trim();
+        if (text === "Copy") copyEmail();
+        if (text === "Refresh") startCheckingInbox();
+        if (text === "New") generateNewEmail();
+        if (text === "Delete") {
+            document.getElementById("mail-address").value = "Deleted...";
+            setTimeout(generateNewEmail, 1000);
+        }
+    });
+});
