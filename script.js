@@ -1,45 +1,49 @@
-const apiURL = "https://www.1secmail.com/api/v1/";
-let userEmail = "";
+let currentEmail = "";
 
-// পেজ লোড হলে অটো মেইল তৈরি হবে
-window.onload = generateNewEmail;
+// পেজ লোড হলেই মেইল জেনারেট হবে
+window.onload = createNew;
 
-async function generateNewEmail() {
-    const res = await fetch(`${apiURL}?action=genEmail&count=1`);
-    const data = await res.json();
-    userEmail = data[0];
-    document.getElementById("mail-address").value = userEmail;
-    checkInbox(); // ইনবক্স রিফ্রেশ
-}
-
-function copyEmail() {
-    const copyText = document.getElementById("mail-address");
-    copyText.select();
-    document.execCommand("copy");
-    alert("Email Copied!");
-}
-
-async function checkInbox() {
-    if(!userEmail) return;
-    const [user, domain] = userEmail.split("@");
-    const res = await fetch(`${apiURL}?action=getMessages&login=${user}&domain=${domain}`);
-    const emails = await res.json();
-    
-    const inboxList = document.getElementById("inbox-list");
-    if(emails.length === 0) {
-        inboxList.innerHTML = '<div class="empty-state">No messages yet...</div>';
-    } else {
-        inboxList.innerHTML = emails.map(msg => `
-            <div style="background:#0f172a; padding:10px; border-radius:10px; margin-bottom:10px; border-left:4px solid #6366f1">
-                <strong>From:</strong> ${msg.from}<br>
-                <strong>Subject:</strong> ${msg.subject}
-            </div>
-        `).join("");
+function createNew() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+    let string = '';
+    for(let i=0; i<10; i++) {
+        string += chars[Math.floor(Math.random() * chars.length)];
     }
+    // ১০টি ডোমেইনের যেকোনো একটি সিলেক্ট করবে
+    const domains = ["1secmail.com", "1secmail.org", "1secmail.net"];
+    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+    
+    currentEmail = string + "@" + randomDomain;
+    document.getElementById("email-field").value = currentEmail;
+    document.getElementById("inbox-list").innerHTML = '<p class="empty-msg">Waiting for messages...</p>';
 }
 
-function deleteMail() {
-    userEmail = "";
-    document.getElementById("mail-address").value = "Deleting...";
-    setTimeout(generateNewEmail, 500);
+function copyMail() {
+    const field = document.getElementById("email-field");
+    field.select();
+    document.execCommand("copy");
+    alert("Copied to clipboard!");
+}
+
+async function refreshInbox() {
+    if (!currentEmail) return;
+    const [user, domain] = currentEmail.split("@");
+    try {
+        const res = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${user}&domain=${domain}`);
+        const data = await res.json();
+        
+        const list = document.getElementById("inbox-list");
+        if (data.length === 0) {
+            list.innerHTML = '<p class="empty-msg">Inbox is empty...</p>';
+        } else {
+            list.innerHTML = data.map(m => `
+                <div style="border-bottom:1px solid #333; padding:10px 0;">
+                    <div style="color:#4ecca3; font-size:12px;">From: ${m.from}</div>
+                    <div style="font-size:14px;">${m.subject}</div>
+                </div>
+            `).join("");
+        }
+    } catch (error) {
+        console.error("Error fetching mail:", error);
+    }
 }
