@@ -1,26 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>TempMail - Guerrilla Mail</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempMailX - Pro Look</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>📧 TEMP MAIL (Guerrilla)</h1>
-        
-        <div class="email-box">
-            <input type="text" id="email" readonly>
-            <button id="copyBtn">📋 COPY</button>
-            <button id="refreshBtn">🔄Refresh </button>
-            <button id="newBtn">✨ New Mail</button>
-        </div>
 
-        <div class="inbox">
-            <h3>📥 Inbox</h3>
-            <ul id="messageList"></ul>
+    <header>
+        <div class="logo">TempMailX<span>.xyz</span></div>
+        <nav>
+            <a href="#">Blog</a>
+            <a href="#">Help</a>
+            <a href="#">FAQ</a>
+            <a href="#">Privacy</a>
+            <a href="#">Contact</a>
+        </nav>
+        <div class="header-right">
+            <i class="fas fa-moon"></i>
+            <select><option>EN</option></select>
         </div>
-    </div>
+    </header>
 
-    <script src="script.js"></script>
+    <main>
+        <section class="hero">
+            <h1>Your temporary email address is ready</h1>
+            <div class="mail-container">
+                <input type="text" id="mail-address" value="bale546@dl.linkpc.net" readonly>
+                <div class="action-sidebar">
+                    <button class="action-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <button class="action-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <button class="action-btn"><i class="fas fa-plus"></i> New</button>
+                    <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="inbox-section">
+            <table class="inbox-table">
+                <thead>
+                    <tr>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>deepseek@mail.com</td>
+                        <td>Welcome to DeepSeek Verification</td>
+                        <td>54 minutes ago</td>
+                    </tr>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+
 </body>
 </html>
