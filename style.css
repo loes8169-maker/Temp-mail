@@ -1,50 +1,8 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    margin: 0;
-    padding: 20px;
-}
-.container {
-    max-width: 700px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.email-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
-}
-input {
-    flex: 2;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-button {
-    padding: 10px 15px;
-    border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-}
-button:hover {
-    background: #0056b3;
-}
-#messageList {
-    list-style: none;
-    padding: 0;
-}
-#messageList li {
-    background: #f9f9f9;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border-left: 4px solid #28a745;
-    word-wrap: break-word;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* হালকা গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড */
 }
